@@ -34,7 +34,7 @@ def train(config, model, train_dataset, valid_dataset):
     load_best_model_at_end = True 
   )
 
-  # Custom Loss 사용을 위해 Trainner 정의 (loss.py)
+  # Custom Loss 사용을 위해 Trainer 정의 (loss.py)
   trainer = MyTrainer(
     config=config,
     model=model,                         # the instantiated 🤗 Transformers model to be trained
