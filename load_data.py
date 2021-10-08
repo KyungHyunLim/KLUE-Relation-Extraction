@@ -31,8 +31,8 @@ def preprocessing_dataset(dataset):
   object_entity_types = []
   object_idx = []
   for subject_entity, object_entity in zip(dataset['subject_entity'], dataset['object_entity']):
-    subject_entity = literal_eval(subject_entity)
-    object_entity = literal_eval(object_entity)
+    subject_entity = literal_eval(subject_entity) # string to dict
+    object_entity = literal_eval(object_entity)   # string to dict
 
     subject_word = subject_entity['word']
     object_word = object_entity['word']
@@ -75,6 +75,30 @@ def load_data(dataset_dir, config, type):
     return dataset, valid
   return dataset
 
+def tokenizing(datset, mode):
+  if mode == 'single':
+    tokenized_sentences = tokenizer(
+          list(dataset['sentence']),
+          return_tensors="pt",
+          padding=True,
+          truncation=True,
+          max_length=256,
+          add_special_tokens=True,
+          #return_token_type_ids=False, # 문장 id
+          )
+  elif mode == 'multi':
+    tokenized_sentences = tokenizer(
+        concat_entity,
+        list(dataset['sentence']),
+        return_tensors="pt",
+        padding=True,
+        truncation=True,
+        max_length=256,
+        add_special_tokens=True,
+        return_token_type_ids=False, # 문장 id
+        )
+  return tokenized_sentences
+
 def tokenized_dataset(config, dataset, tokenizer):
   """ tokenizer에 따라 sentence를 tokenizing 합니다."""
   
@@ -86,59 +110,30 @@ def tokenized_dataset(config, dataset, tokenizer):
         temp_sentence = (temp_sentence[:e01_idx[0]] + f'@ * {type_to_ko[e01_type]} * ' + temp_sentence[e01_idx[0]:e01_idx[1]+1] + ' @ ' 
         + temp_sentence[e01_idx[1]+1:e02_idx[0]] + f'+ ^ {type_to_ko[e02_type]} ^ ' + temp_sentence[e02_idx[0]:e02_idx[1]+1] + ' + ' + temp_sentence[e02_idx[1]+1:])
         dataset['sentence'].iloc[idx] = temp_sentence
-    tokenized_sentences = tokenizer(
-        list(dataset['sentence']),
-        return_tensors="pt",
-        padding=True,
-        truncation=True,
-        max_length=256,
-        add_special_tokens=True,
-        #return_token_type_ids=False, # 문장 id
-        )
+    tokenized_sentences = tokenizing(dataset, 'single')
+    
   elif config.add_special_token == 'punct':
     for idx, (e01_idx, e01_type, e02_idx, e02_type) in enumerate(zip(dataset['subject_entity_idx'], dataset['subject_entity_types'], dataset['object_entity_idx'], dataset['object_entity_types'])):
         temp_sentence = dataset['sentence'].iloc[idx]
         temp_sentence = (temp_sentence[:e01_idx[0]] + f' @* ' + temp_sentence[e01_idx[0]:e01_idx[1]+1] + ' @ ' 
         + temp_sentence[e01_idx[1]+1:e02_idx[0]] + f' +^ ' + temp_sentence[e02_idx[0]:e02_idx[1]+1] + ' + ' + temp_sentence[e02_idx[1]+1:])
         dataset['sentence'].iloc[idx] = temp_sentence
-    tokenized_sentences = tokenizer(
-        list(dataset['sentence']),
-        return_tensors="pt",
-        padding=True,
-        truncation=True,
-        max_length=256,
-        add_special_tokens=True,
-        #return_token_type_ids=False, # 문장 id
-        )
+    tokenized_sentences = tokenizing(dataset, 'single')
+    
   elif config.add_special_token == 'special':
     for idx, (e01_idx, e01_type, e02_idx, e02_type) in enumerate(zip(dataset['subject_entity_idx'], dataset['subject_entity_types'], dataset['object_entity_idx'], dataset['object_entity_types'])):
       temp_sentence = dataset['sentence'].iloc[idx]
       temp_sentence = (temp_sentence[:e01_idx[0]] + ' [E1] ' + temp_sentence[e01_idx[0]:e01_idx[1]+1] + ' [/E1] ' 
       + temp_sentence[e01_idx[1]+1:e02_idx[0]] + ' [E2] ' + temp_sentence[e02_idx[0]:e02_idx[1]+1] + ' [/E2] ' + temp_sentence[e02_idx[1]+1:])
       dataset['sentence'].iloc[idx] = temp_sentence
-    tokenized_sentences = tokenizer(
-        list(dataset['sentence']),
-        return_tensors="pt",
-        padding=True,
-        truncation=True,
-        max_length=256,
-        add_special_tokens=True,
-        #return_token_type_ids=False, # 문장 id
-        )
+    tokenized_sentences = tokenizing(dataset, 'single')
+    
   else:
     for e01, e02 in zip(dataset['subject_entity'], dataset['object_entity']):
       temp = ''
       temp = e01 + '[SEP]' + e02
       concat_entity.append(temp)
-    tokenized_sentences = tokenizer(
-        concat_entity,
-        list(dataset['sentence']),
-        return_tensors="pt",
-        padding=True,
-        truncation=True,
-        max_length=256,
-        add_special_tokens=True,
-        return_token_type_ids=False, # 문장 id
-        )
+    tokenized_sentences = tokenizing(dataset, 'multi')
+    
   return tokenized_sentences
 
