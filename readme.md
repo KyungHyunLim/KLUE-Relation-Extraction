@@ -121,4 +121,5 @@ two_step_infernece.py -c <config file path>
 ![캡처](https://user-images.githubusercontent.com/72729802/136358624-51bd79f0-afd8-4e93-a5b6-e74a31a0afb2.PNG)
 
 # 6. Refference
-https://github.com/KLUE-benchmark/KLUE
+* [KLUE - Benchmark](https://github.com/KLUE-benchmark/KLUE)
+* More details: [Post](https://kyunghyunlim.github.io/klue/nlp/2021/10/07/kluere.html)
