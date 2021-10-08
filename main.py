@@ -53,13 +53,6 @@ if __name__ == "__main__":
         label = label_to_num(config, train_dataset['label'].values)
         config.class_weight = get_class_weights(label)
         # 데이터 라벨의 비율 맞게 훈련/검증 데이터 분리
-    #train_dataset, valid_dataset = train_test_split(dataset, test_size=0.2, stratify=dataset['label'], shuffle=True, random_state=config.random_state)
-    ####################################################### temp 시도
-    #no_rel_dataset = train_dataset.loc[train_dataset['label']=='no_relation']
-    #train_dataset = train_dataset.loc[train_dataset['label']!='no_relation']
-    #train_dataset = pd.concat([train_dataset, no_rel_dataset.iloc[:3000]], axis=0)
-    ######################################################
-    #print('loded:\t', train_dataset.shape)
 
         # 추가된 데이터를 사용 한다면
     if config.use_aug_data:
@@ -117,6 +110,6 @@ if __name__ == "__main__":
     print('='*10, "END", '='*10)
 
     # 7. Inference
-    # if config.prediction_mode not in ['binary', 'multi']:
-    #     print('='*10, "Start inference...", '='*10)
-    #     do_inference(config)
+#     if config.prediction_mode not in ['binary', 'multi']:
+#         print('='*10, "Start inference...", '='*10)
+#         do_inference(config)
