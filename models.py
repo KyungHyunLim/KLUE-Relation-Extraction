@@ -16,6 +16,11 @@ class MyRobertaClassificationHead(nn.Module):
         self.out_proj = nn.Linear(config.hidden_size, config.num_labels)
 
     def forward(self, features, entity_location):
+        '''
+        Additional input
+        [CLS] token embedding vector, Avg subject entity embedding vectors, Avg object entity embedding vectors
+        '''
+        
         subject_entity_avgs = []
         oject_entity_avgs = []
         for idx in range(entity_location.shape[0]):
